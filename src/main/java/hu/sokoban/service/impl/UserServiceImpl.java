@@ -2,6 +2,7 @@ package hu.sokoban.service.impl;
 
 import hu.sokoban.dto.RegistrationDto;
 import hu.sokoban.model.User;
+import hu.sokoban.model.enums.Role;
 import hu.sokoban.repository.UserRepository;
 import hu.sokoban.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,6 +36,11 @@ public class UserServiceImpl implements UserService {
                 dto.getEmail(),
                 passwordEncoder.encode(dto.getPassword())
         );
+
+        if (userRepository.count() == 0) {
+            user.setRole(Role.ADMIN);
+        }
+
         return userRepository.save(user);
     }
 
