@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Bejelentkezes - Sokoban Portal</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="container">
+        <div th:replace="~{fragments/layout :: alerts}"></div>
+
+        <div class="form-container">
+            <h2>Bejelentkezes</h2>
+
+            <div th:if="${param.error}" class="alert alert-error">
+                Hibas felhasznalonev vagy jelszo.
+            </div>
+            <div th:if="${param.logout}" class="alert alert-success">
+                Sikeresen kijelentkeztel.
+            </div>
+
+            <form th:action="@{/login}" method="post">
+                <div class="form-group">
+                    <label for="username">Felhasznalonev</label>
+                    <input type="text" id="username" name="username" required autofocus/>
+                </div>
+                <div class="form-group">
+                    <label for="password">Jelszo</label>
+                    <input type="password" id="password" name="password" required/>
+                </div>
+                <button type="submit" class="btn btn-primary">Bejelentkezes</button>
+            </form>
+            <p class="form-footer">
+                Meg nincs fiokod? <a href="/register">Regisztralj!</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

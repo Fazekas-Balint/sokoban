@@ -25,16 +25,17 @@ public class MapServiceImpl implements MapService {
 
     @Override
     public SokobanMap create(MapDto dto, User uploader) {
-        mapValidator.validate(dto.getMapData());
+        String sanitized = mapValidator.sanitize(dto.getMapData());
+        mapValidator.validate(sanitized);
 
-        String[] lines = dto.getMapData().split("\n", -1);
+        String[] lines = sanitized.split("\n", -1);
         int rows = lines.length;
         int cols = 0;
         for (String line : lines) {
             cols = Math.max(cols, line.length());
         }
 
-        SokobanMap map = new SokobanMap(dto.getName(), dto.getMapData(), rows, cols, uploader);
+        SokobanMap map = new SokobanMap(dto.getName(), sanitized, rows, cols, uploader);
         map.setDifficulty(dto.getDifficulty());
         return mapRepository.save(map);
     }

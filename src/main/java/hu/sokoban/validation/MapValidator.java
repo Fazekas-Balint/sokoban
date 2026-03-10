@@ -9,11 +9,21 @@ public class MapValidator {
 
     private static final Set<Character> VALID_CHARS = Set.of('#', ' ', '@', '+', '$', '*', '.');
 
+    public String sanitize(String mapData) {
+        if (mapData == null) return null;
+        return mapData
+                .replace("\r\n", "\n")
+                .replace("\r", "\n")
+                .replace('\u00A0', ' ')
+                .replace('\t', ' ');
+    }
+
     public void validate(String mapData) {
         if (mapData == null || mapData.isBlank()) {
             throw new MapValidationException("A palya nem lehet ures");
         }
 
+        mapData = sanitize(mapData);
         String[] lines = mapData.split("\n", -1);
 
         // Ures sorok eltavolitasa a vegerol
