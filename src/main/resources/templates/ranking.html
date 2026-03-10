@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Ranglista - Sokoban Portal</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="container">
+        <h1>Ranglista</h1>
+
+        <div th:if="${#lists.isEmpty(rankings)}" class="empty-state">
+            <p>Meg nincs kiertekelt heurisztika.</p>
+        </div>
+        <table th:unless="${#lists.isEmpty(rankings)}" class="ranking-table">
+            <thead>
+                <tr>
+                    <th>Hely</th>
+                    <th>Felhasznalo</th>
+                    <th>Heurisztika</th>
+                    <th>Osszpont</th>
+                    <th>Megoldott palyak</th>
+                    <th>Atl. csomopontok</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="entry : ${rankings}" th:classappend="${entry.rank <= 3} ? 'top-rank'">
+                    <td th:text="${entry.rank} + '.'"></td>
+                    <td th:text="${entry.username}"></td>
+                    <td>
+                        <a th:href="@{/heuristics/{id}(id=${entry.heuristicId})}"
+                           th:text="${entry.heuristicName}"></a>
+                    </td>
+                    <td th:text="${#numbers.formatDecimal(entry.totalScore, 0, 1)}"></td>
+                    <td th:text="${entry.solvedCount} + '/' + ${entry.totalMaps}"></td>
+                    <td th:text="${#numbers.formatDecimal(entry.avgNodesExpanded, 0, 0)}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<!-- Navbar fragment -->
+<nav th:fragment="navbar" class="navbar">
+    <div class="nav-brand">
+        <a href="/">Sokoban Portal</a>
+    </div>
+    <div class="nav-links">
+        <a href="/" class="nav-link">Fooldal</a>
+        <a href="/ranking" class="nav-link">Ranglista</a>
+        <a sec:authorize="isAuthenticated()" href="/maps" class="nav-link">Palyak</a>
+        <a sec:authorize="isAuthenticated()" href="/heuristics" class="nav-link">Heurisztikak</a>
+        <a sec:authorize="isAuthenticated()" href="/profile" class="nav-link">Profil</a>
+        <a sec:authorize="hasRole('ADMIN')" href="/admin" class="nav-link nav-admin">Admin</a>
+        <a sec:authorize="!isAuthenticated()" href="/login" class="nav-link">Bejelentkezes</a>
+        <a sec:authorize="!isAuthenticated()" href="/register" class="nav-link">Regisztracio</a>
+        <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" class="nav-logout">
+            <button type="submit" class="nav-link btn-link">Kijelentkezes</button>
+        </form>
+    </div>
+</nav>
+
+<!-- Alert fragment -->
+<div th:fragment="alerts">
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+    <div th:if="${testResult}" class="alert alert-info" th:text="${testResult}"></div>
+</div>
+
+</html>

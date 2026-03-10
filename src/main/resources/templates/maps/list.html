@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Palyak - Sokoban Portal</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="container">
+        <div th:replace="~{fragments/layout :: alerts}"></div>
+
+        <div class="page-header">
+            <h1>Palyak</h1>
+            <a href="/maps/upload" class="btn btn-primary">Uj palya feltoltese</a>
+        </div>
+
+        <div th:if="${#lists.isEmpty(maps)}" class="empty-state">
+            <p>Meg nincs feltoltott palya.</p>
+        </div>
+
+        <div class="card-grid">
+            <div th:each="map : ${maps}" class="card">
+                <h3>
+                    <a th:href="@{/maps/{id}(id=${map.id})}" th:text="${map.name}"></a>
+                </h3>
+                <p class="card-meta">
+                    <span th:text="${map.rows} + ' x ' + ${map.cols}"></span>
+                    <span th:if="${map.difficulty}" th:text="' | ' + ${map.difficulty}"></span>
+                    <span th:if="${map.benchmark}" class="badge">Benchmark</span>
+                </p>
+                <p class="card-meta" th:text="'Feltoltotte: ' + ${map.uploadedBy.username}"></p>
+                <pre class="map-preview" th:text="${map.mapData}"></pre>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
