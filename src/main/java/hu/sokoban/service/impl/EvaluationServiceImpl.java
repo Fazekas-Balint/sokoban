@@ -69,6 +69,18 @@ public class EvaluationServiceImpl implements EvaluationService {
         }
 
         for (Heuristic heuristic : heuristics) {
+            // Ujraforditas, ha a memoriaban nincs meg a leforditott osztaly
+            try {
+                compilerService.loadCompiled(heuristic.getId());
+            } catch (IllegalStateException e) {
+                log.info("Heurisztika ujraforditasa szukseges: {} (id={})", heuristic.getName(), heuristic.getId());
+                var result = compilerService.compile(heuristic.getId(), heuristic.getSourceCode());
+                if (!result.success()) {
+                    log.error("Ujraforditas sikertelen - heurisztika: {} - {}", heuristic.getId(), result.errorMessage());
+                    continue;
+                }
+            }
+
             for (SokobanMap map : maps) {
                 try {
                     SolutionResult solution = evaluateSingle(heuristic, map);
