@@ -20,10 +20,48 @@ public class HeuristicCompilerServiceImpl implements HeuristicCompilerService {
     private static final String CLASS_PREFIX = "UserHeuristic_";
     private static final String PACKAGE_NAME = "hu.sokoban.generated";
 
+    /**
+     * Tiltott kulcsszavak/osztalyok a felhasznaloi kodban.
+     * Ezek megakadalyozzak a fajlrendszer-, halozat-, process- es reflection-hozzaferest.
+     */
+    private static final List<String> FORBIDDEN_PATTERNS = List.of(
+            // Fajlrendszer
+            "java.io.File", "java.nio", "FileInputStream", "FileOutputStream",
+            "FileReader", "FileWriter", "RandomAccessFile", "Files.",
+            "Paths.", "Path.", "File.",
+            // Halozat
+            "java.net", "Socket", "ServerSocket", "URL", "URI",
+            "HttpClient", "HttpURLConnection", "DatagramSocket",
+            // Process / Runtime
+            "Runtime", "ProcessBuilder", "Process",
+            // Reflection
+            "java.lang.reflect", "Class.forName", "getClass()",
+            "getDeclaredMethod", "getDeclaredField", "setAccessible",
+            "Method.", "Field.", "Constructor.",
+            // ClassLoader / bytecode
+            "ClassLoader", "defineClass", "URLClassLoader",
+            // System
+            "System.exit", "System.setProperty", "System.getenv",
+            "System.setOut", "System.setErr", "System.setIn",
+            // Thread
+            "Thread", "Runnable", "ExecutorService", "Executor",
+            "CompletableFuture", "ForkJoinPool",
+            // Unsafe / JNI
+            "Unsafe", "native ",
+            // Import (csak engine importot engedunk)
+            "import "
+    );
+
     private final Map<Long, Class<?>> compiledClasses = new ConcurrentHashMap<>();
 
     @Override
     public CompilationResult compile(Long heuristicId, String sourceCode) {
+        // Biztonsagi ellenorzes: tiltott mintak keresese
+        String securityError = checkForbiddenPatterns(sourceCode);
+        if (securityError != null) {
+            return CompilationResult.error(securityError);
+        }
+
         String className = CLASS_PREFIX + heuristicId;
         String fullClassName = PACKAGE_NAME + "." + className;
 
@@ -79,6 +117,22 @@ public class HeuristicCompilerServiceImpl implements HeuristicCompilerService {
         } catch (Exception e) {
             throw new IllegalStateException("Nem sikerult peldanyositani a heuristzikat: " + heuristicId, e);
         }
+    }
+
+    /**
+     * Ellenorzi, hogy a felhasznaloi kod tartalmaz-e tiltott mintakat.
+     * @return hibauzenet, vagy null ha rendben van
+     */
+    private String checkForbiddenPatterns(String sourceCode) {
+        for (String pattern : FORBIDDEN_PATTERNS) {
+            if (sourceCode.contains(pattern)) {
+                log.warn("Tiltott minta talalva a heurisztika kodban: {}", pattern);
+                return "Biztonsagi hiba: tiltott kod minta: \"" + pattern + "\". "
+                        + "A heurisztika csak a SokobanState API-t hasznalhatja, "
+                        + "kulon importok es rendszerhivasok nem engedelyezettek.";
+            }
+        }
+        return null;
     }
 
     private String generateWrapperSource(String className, String sourceCode) {

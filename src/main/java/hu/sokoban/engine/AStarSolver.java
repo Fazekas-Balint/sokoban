@@ -21,7 +21,11 @@ public class AStarSolver {
         PriorityQueue<Node> open = new PriorityQueue<>(Comparator.comparingInt(Node::getF));
         Map<SokobanState, Integer> bestG = new HashMap<>();
 
-        Node startNode = new Node(initialState, null, 0, heuristic.heur(initialState));
+        int initialH = safeHeur(initialState);
+        if (initialH == Integer.MAX_VALUE) {
+            return SolutionResult.failure(0, elapsed(startTime));
+        }
+        Node startNode = new Node(initialState, null, 0, initialH);
         open.add(startNode);
         bestG.put(initialState, 0);
 
@@ -54,12 +58,28 @@ public class AStarSolver {
                 }
 
                 bestG.put(successor, tentativeG);
-                int h = heuristic.heur(successor);
+                int h = safeHeur(successor);
+                if (h == Integer.MAX_VALUE) {
+                    return SolutionResult.failure(nodesExpanded, elapsed(startTime));
+                }
                 open.add(new Node(successor, current, tentativeG, h));
             }
         }
 
         return SolutionResult.failure(nodesExpanded, elapsed(startTime));
+    }
+
+    /**
+     * Biztonsagos heurisztika hivas: elkapja a felhasznaloi kod kivetelet,
+     * hogy egy hibas/rosszindulatu heurisztika ne omlessze az egesz solvert.
+     */
+    private int safeHeur(SokobanState state) {
+        try {
+            int result = heuristic.heur(state);
+            return Math.max(0, result);
+        } catch (Exception | StackOverflowError | OutOfMemoryError e) {
+            return Integer.MAX_VALUE;
+        }
     }
 
     private long elapsed(long startTime) {
