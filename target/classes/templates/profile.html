@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Profil - Sokoban Portal</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="container">
+        <h1 th:text="'Profil: ' + ${user.username}"></h1>
+        <p th:text="'Regisztralt: ' + ${#temporals.format(user.registeredAt, 'yyyy.MM.dd')}"></p>
+
+        <!-- Ranglista pozicio -->
+        <div th:unless="${#lists.isEmpty(rankings)}">
+            <div th:each="entry : ${rankings}" th:if="${entry.username == user.username}" class="rank-highlight">
+                <h3 th:text="'Aktualis pozicio: ' + ${entry.rank} + '. hely'"></h3>
+                <p th:text="'Osszpont: ' + ${#numbers.formatDecimal(entry.totalScore, 0, 1)}"></p>
+            </div>
+        </div>
+
+        <!-- Sajat heurisztikak -->
+        <h2>Heurisztikaid</h2>
+        <div th:if="${#lists.isEmpty(heuristics)}" class="empty-state">
+            <p>Meg nincs heurisztikad. <a href="/heuristics/new">Irj egyet!</a></p>
+        </div>
+        <table th:unless="${#lists.isEmpty(heuristics)}" class="data-table">
+            <thead>
+                <tr>
+                    <th>Nev</th>
+                    <th>Statusz</th>
+                    <th>Letrehozva</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="h : ${heuristics}">
+                    <td><a th:href="@{/heuristics/{id}(id=${h.id})}" th:text="${h.name}"></a></td>
+                    <td><span class="status" th:classappend="${h.status.name()}" th:text="${h.status}"></span></td>
+                    <td th:text="${#temporals.format(h.createdAt, 'yyyy.MM.dd HH:mm')}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Sajat palyak -->
+        <h2>Feltoltott palyaid</h2>
+        <div th:if="${#lists.isEmpty(maps)}" class="empty-state">
+            <p>Meg nincs feltoltott palyad. <a href="/maps/upload">Tolts fel egyet!</a></p>
+        </div>
+        <table th:unless="${#lists.isEmpty(maps)}" class="data-table">
+            <thead>
+                <tr>
+                    <th>Nev</th>
+                    <th>Meret</th>
+                    <th>Feltoltve</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="m : ${maps}">
+                    <td><a th:href="@{/maps/{id}(id=${m.id})}" th:text="${m.name}"></a></td>
+                    <td th:text="${m.rows} + ' x ' + ${m.cols}"></td>
+                    <td th:text="${#temporals.format(m.uploadedAt, 'yyyy.MM.dd HH:mm')}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

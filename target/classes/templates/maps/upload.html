@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Palya feltoltese - Sokoban Portal</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="container">
+        <h1>Uj palya feltoltese</h1>
+
+        <form th:action="@{/maps/upload}" th:object="${mapDto}" method="post">
+            <div class="form-group">
+                <label for="name">Palya neve</label>
+                <input type="text" id="name" th:field="*{name}" placeholder="pl. Warehouse-3" required/>
+                <span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+            </div>
+            <div class="form-group">
+                <label for="difficulty">Nehezseg (opcionalis)</label>
+                <select id="difficulty" th:field="*{difficulty}">
+                    <option value="">-- Valassz --</option>
+                    <option value="EASY">Konnyu</option>
+                    <option value="MEDIUM">Kozepes</option>
+                    <option value="HARD">Nehez</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="mapData">Palya (ASCII formatum)</label>
+                <textarea id="mapData" th:field="*{mapData}" rows="15" class="code-input"
+                          placeholder="  ####&#10;###  ####&#10;#     $ #&#10;# #  #$ #&#10;# . .#@ #&#10;#########"></textarea>
+                <span class="error" th:if="${#fields.hasErrors('mapData')}" th:errors="*{mapData}"></span>
+                <div class="help-text">
+                    Karakterek: # fal, @ jatekos, $ doboz, . celmezo, * doboz celmezon, + jatekos celmezon, (szokoz) ures
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Feltoltes</button>
+            <a href="/maps" class="btn btn-secondary">Megse</a>
+        </form>
+    </div>
+</body>
+</html>

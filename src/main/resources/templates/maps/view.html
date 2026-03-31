@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="'Palya: ' + ${map.name}">Palya</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="container">
+        <div th:replace="~{fragments/layout :: alerts}"></div>
+
+        <h1 th:text="${map.name}"></h1>
+        <div class="map-info">
+            <span th:text="'Meret: ' + ${map.rows} + ' x ' + ${map.cols}"></span>
+            <span th:if="${map.difficulty}" th:text="' | Nehezseg: ' + ${map.difficulty}"></span>
+            <span th:if="${map.benchmark}" class="badge">Benchmark palya</span>
+            <span th:text="' | Feltoltotte: ' + ${map.uploadedBy.username}"></span>
+        </div>
+
+        <h3>Palya nezet</h3>
+        <div id="map-visual" class="map-visual"></div>
+        <pre class="map-ascii" th:text="${map.mapData}"></pre>
+
+        <a href="/maps" class="btn btn-secondary">Vissza a palyakhoz</a>
+    </div>
+
+    <script th:inline="javascript">
+        const mapData = /*[[${map.mapData}]]*/ '';
+        const container = document.getElementById('map-visual');
+        const lines = mapData.split('\n');
+        const maxCols = Math.max(...lines.map(l => l.length));
+
+        const grid = document.createElement('div');
+        grid.className = 'sokoban-grid';
+        grid.style.gridTemplateColumns = `repeat(${maxCols}, 32px)`;
+
+        const charMap = {
+            '#': 'wall', ' ': 'floor', '@': 'player', '+': 'player-on-goal',
+            '$': 'box', '*': 'box-on-goal', '.': 'goal'
+        };
+
+        for (const line of lines) {
+            for (let c = 0; c < maxCols; c++) {
+                const ch = c < line.length ? line[c] : ' ';
+                const cell = document.createElement('div');
+                cell.className = 'cell ' + (charMap[ch] || 'floor');
+                grid.appendChild(cell);
+            }
+        }
+        container.appendChild(grid);
+    </script>
+</body>
+</html>

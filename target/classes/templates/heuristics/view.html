@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="'Heurisztika: ' + ${heuristic.name}">Heurisztika</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="container">
+        <div th:replace="~{fragments/layout :: alerts}"></div>
+
+        <h1 th:text="${heuristic.name}"></h1>
+        <div class="heuristic-meta">
+            <span class="status" th:classappend="${heuristic.status.name()}" th:text="${heuristic.status}"></span>
+            <span th:text="' | Szerzo: ' + ${heuristic.author.username}"></span>
+            <span th:text="' | Letrehozva: ' + ${#temporals.format(heuristic.createdAt, 'yyyy.MM.dd HH:mm')}"></span>
+        </div>
+
+        <div th:if="${heuristic.compilationError}" class="alert alert-error">
+            <strong>Forditasi hiba:</strong>
+            <pre th:text="${heuristic.compilationError}"></pre>
+        </div>
+
+        <h3>Forraskod</h3>
+        <pre class="source-code" th:text="${heuristic.sourceCode}"></pre>
+
+        <div class="actions">
+            <a th:href="@{/heuristics/{id}/edit(id=${heuristic.id})}" class="btn btn-primary">Szerkesztes</a>
+            <a href="/heuristics" class="btn btn-secondary">Vissza</a>
+        </div>
+
+        <!-- Kiprobals szekci -->
+        <div th:if="${heuristic.status.name() == 'COMPILED' and not #lists.isEmpty(maps)}">
+            <h3>Kiprobalas</h3>
+            <div class="test-section">
+                <div th:each="map : ${maps}" class="test-map-row">
+                    <span th:text="${map.name}"></span>
+                    <form th:action="@{/heuristics/{hId}/test/{mId}(hId=${heuristic.id}, mId=${map.id})}"
+                          method="post" class="inline-form">
+                        <button type="submit" class="btn btn-small">Futtatas</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Eredmenyek -->
+        <div th:unless="${#lists.isEmpty(results)}">
+            <h3>Kiertekelesek eredmenyei</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Palya</th>
+                        <th>Megoldotta?</th>
+                        <th>Csomopontok</th>
+                        <th>Lepesek</th>
+                        <th>Ido (ms)</th>
+                        <th>Pont</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="r : ${results}">
+                        <td>
+                            <a th:href="@{/maps/{id}(id=${r.sokobanMap.id})}"
+                               th:text="${r.sokobanMap.name}"></a>
+                        </td>
+                        <td th:text="${r.solved} ? 'Igen' : (${r.timedOut} ? 'Timeout' : 'Nem')"></td>
+                        <td th:text="${r.nodesExpanded}"></td>
+                        <td th:text="${r.solved} ? ${r.solutionLength} : '-'"></td>
+                        <td th:text="${r.executionTimeMs}"></td>
+                        <td th:text="${#numbers.formatDecimal(r.score, 0, 1)}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

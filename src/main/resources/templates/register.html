@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Regisztracio - Sokoban Portal</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="container">
+        <div class="form-container">
+            <h2>Regisztracio</h2>
+
+            <form th:action="@{/register}" th:object="${registration}" method="post">
+                <div class="form-group">
+                    <label for="username">Felhasznalonev</label>
+                    <input type="text" id="username" th:field="*{username}" required/>
+                    <span class="error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" th:field="*{email}" required/>
+                    <span class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+                </div>
+                <div class="form-group">
+                    <label for="password">Jelszo</label>
+                    <input type="password" id="password" th:field="*{password}" required/>
+                    <span class="error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Jelszo megerositese</label>
+                    <input type="password" id="confirmPassword" th:field="*{confirmPassword}" required/>
+                    <span class="error" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></span>
+                </div>
+                <button type="submit" class="btn btn-primary">Regisztracio</button>
+            </form>
+            <p class="form-footer">
+                Mar van fiokod? <a href="/login">Jelentkezz be!</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

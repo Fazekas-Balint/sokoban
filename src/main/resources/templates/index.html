@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Sokoban Heurisztika Portal</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="container">
+        <div th:replace="~{fragments/layout :: alerts}"></div>
+
+        <div class="hero">
+            <h1>Sokoban Heurisztika Verseny</h1>
+            <p>Ird meg a legjobb A* heurisztikat es kerdezd ki a tobbi versenyzot!</p>
+            <div sec:authorize="!isAuthenticated()" class="hero-actions">
+                <a href="/register" class="btn btn-primary">Regisztracio</a>
+                <a href="/login" class="btn btn-secondary">Bejelentkezes</a>
+            </div>
+            <div sec:authorize="isAuthenticated()" class="hero-actions">
+                <a href="/heuristics/new" class="btn btn-primary">Uj heurisztika</a>
+                <a href="/maps/upload" class="btn btn-secondary">Palya feltoltese</a>
+            </div>
+        </div>
+
+        <h2>Aktualis ranglista</h2>
+        <div th:if="${#lists.isEmpty(rankings)}" class="empty-state">
+            <p>Meg nincs kiertekelt heurisztika. Legy az elso!</p>
+        </div>
+        <table th:unless="${#lists.isEmpty(rankings)}" class="ranking-table">
+            <thead>
+                <tr>
+                    <th>Hely</th>
+                    <th>Felhasznalo</th>
+                    <th>Heurisztika</th>
+                    <th>Osszpont</th>
+                    <th>Megoldott</th>
+                    <th>Atl. csomopontok</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="entry : ${rankings}">
+                    <td th:text="${entry.rank} + '.'"></td>
+                    <td th:text="${entry.username}"></td>
+                    <td>
+                        <a th:href="@{/heuristics/{id}(id=${entry.heuristicId})}"
+                           th:text="${entry.heuristicName}"></a>
+                    </td>
+                    <td th:text="${#numbers.formatDecimal(entry.totalScore, 0, 1)}"></td>
+                    <td th:text="${entry.solvedCount} + '/' + ${entry.totalMaps}"></td>
+                    <td th:text="${#numbers.formatDecimal(entry.avgNodesExpanded, 0, 0)}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

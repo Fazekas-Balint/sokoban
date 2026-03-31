@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Admin - Sokoban Portal</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="container">
+        <div th:replace="~{fragments/layout :: alerts}"></div>
+
+        <h1>Admin Dashboard</h1>
+
+        <!-- Manualis kiertekeles -->
+        <div class="admin-section">
+            <h2>Kiertekeles</h2>
+            <form th:action="@{/admin/evaluate}" method="post">
+                <button type="submit" class="btn btn-primary">Kiertekeles inditasa</button>
+            </form>
+            <p class="help-text">
+                Benchmark palyak szama: <strong th:text="${#lists.size(benchmarkMaps)}"></strong>
+            </p>
+        </div>
+
+        <!-- Palyak kezelese -->
+        <div class="admin-section">
+            <h2>Palyak kezelese</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Nev</th>
+                        <th>Meret</th>
+                        <th>Feltolto</th>
+                        <th>Benchmark</th>
+                        <th>Muveletek</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="map : ${maps}">
+                        <td>
+                            <a th:href="@{/maps/{id}(id=${map.id})}" th:text="${map.name}"></a>
+                        </td>
+                        <td th:text="${map.rows} + 'x' + ${map.cols}"></td>
+                        <td th:text="${map.uploadedBy.username}"></td>
+                        <td>
+                            <form th:action="@{/admin/maps/{id}/toggle-benchmark(id=${map.id})}" method="post" class="inline-form">
+                                <button type="submit" class="btn btn-small"
+                                        th:text="${map.benchmark} ? 'Benchmark KI' : 'Benchmark BE'"></button>
+                            </form>
+                        </td>
+                        <td>
+                            <form th:action="@{/admin/maps/{id}/delete(id=${map.id})}" method="post" class="inline-form"
+                                  onsubmit="return confirm('Biztosan torlod?')">
+                                <button type="submit" class="btn btn-small btn-danger">Torles</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

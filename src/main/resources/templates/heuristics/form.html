@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Heurisztika szerkeszto - Sokoban Portal</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="container">
+        <h1 th:text="${heuristicId != null} ? 'Heurisztika szerkesztese' : 'Uj heurisztika'"></h1>
+
+        <form th:action="${heuristicId != null} ? @{/heuristics/{id}/edit(id=${heuristicId})} : @{/heuristics/new}"
+              th:object="${heuristicDto}" method="post">
+
+            <div class="form-group">
+                <label for="name">Heurisztika neve</label>
+                <input type="text" id="name" th:field="*{name}" placeholder="pl. Manhattan-v1" required/>
+                <span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="sourceCode">Forraskod (Java)</label>
+                <textarea id="sourceCode" th:field="*{sourceCode}" rows="20" class="code-input" required></textarea>
+                <span class="error" th:if="${#fields.hasErrors('sourceCode')}" th:errors="*{sourceCode}"></span>
+                <div class="help-text">
+                    Irj egy <code>public int heur(SokobanState state)</code> metodust.
+                    Elerheto: state.getPlayerRow(), getPlayerCol(), isWall(r,c), isGoal(r,c),
+                    isBox(r,c), getRows(), getCols(), getBoxCount(), getGoalCount()
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Bekuldes</button>
+            <a href="/heuristics" class="btn btn-secondary">Megse</a>
+        </form>
+    </div>
+</body>
+</html>
